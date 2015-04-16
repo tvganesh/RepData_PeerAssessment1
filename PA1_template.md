@@ -1,22 +1,40 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 # Developed by : Tinniam V Ganesh
 
-```{r}
+
+```r
 library(dplyr)
+```
+
+```
+## 
+## Attaching package: 'dplyr'
+## 
+## The following object is masked from 'package:stats':
+## 
+##     filter
+## 
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+```
+
+```r
 library(lubridate)
 ```
+
+```
+## Warning: package 'lubridate' was built under R version 3.1.3
+```
 ## Loading and preprocessing the data
-```{r}
+
+```r
 setwd("C:\\software\\R\\coursera\\reproducible-research\\peer-assignment-1\\git-in\\RepData_PeerAssessment1")
 ```
 # Specify the extract folder
 # The file is extracted into the current folder
-```{r}
+
+```r
 unzip("./activity.zip",  exdir = ".")
 a <- read.csv("activity.csv")
 activity <- read.csv("activity.csv",
@@ -27,23 +45,28 @@ c <- activity[b,]
 
 ## What is mean total number of steps taken per day?
 
-```{r}
+
+```r
 d <-tbl_df(c)
 ```
 
 # Generate the total steps based on date
-```{r}
+
+```r
 e <- summarise(group_by(d,date),total_steps = sum(steps))
 ```
 
 # Create a histogram of the total steps taken
 1. Draw the mean (red)
 2. Draw the median (blue
-```{r HistogramSteps}
+
+```r
 hist(e$total_steps,main="Total steps",xlab="Steps",ylab="Frequency")
 abline(v=mean(e$total_steps),col="blue",lwd=2.0,lty=2)
 abline(v=median(e$total_steps),col="red",lwd=2.0,lty=4)
 ```
+
+![](PA1_template_files/figure-html/HistogramSteps-1.png) 
 
 
 ## Inputing missing values
@@ -51,12 +74,14 @@ abline(v=median(e$total_steps),col="red",lwd=2.0,lty=4)
 
 1. Group by date and calculate the average steps for these date values
 2. Substitute these average values where the values are missing
-```{r}
+
+```r
 avg <- summarise(group_by(d,date),mean_steps = mean(steps))
 ```
 
 # Substitute average steps where the value is 0
-```{r}
+
+```r
 for(i in 1:length(avg$date)) {
     val <- avg$mean_steps[i]
     # Find values that are missing
@@ -67,13 +92,15 @@ for(i in 1:length(avg$date)) {
 ```
 
 ## What is the average daily activity pattern
-```{r}
+
+```r
 interval <- seq(from=0,to=2355,by=5)
 ```
 
 # Group by the sequence of intervals and calculate the mean over days in the 
 # interval
-```{r}
+
+```r
 for(i in seq_along(interval)) {
   averageSteps <- summarise(group_by(d,interval), m = mean(steps))
    
@@ -81,12 +108,15 @@ for(i in seq_along(interval)) {
 ```
 # Plot the average steps for each interval over all days
 # Compute the maximum and plot the line
-```{r AverageSteps}
+
+```r
 plot(averageSteps$interval,averageSteps$m,type="l",xlab="Interval",
                 ylab="Mean Steps", main="Mean steps versus Interval",col="blue",
                 ylim=c(0,250), lwd=2.0)
 abline(h=max(averageSteps$m),col="red",lty=2,lwd=2)
 ```
+
+![](PA1_template_files/figure-html/AverageSteps-1.png) 
 
 
 `
@@ -94,23 +124,27 @@ abline(h=max(averageSteps$m),col="red",lty=2,lwd=2)
 ## Are there differences in activity patterns between weekdays and weekends?
 
 # Use the wday function from the package 'mutate' and get the days
-```{r}
+
+```r
 d1 <- mutate(d,day=wday(date,label=TRUE))
 ```
 
 # Identify weekdays **'m'** and weekend **'!m'**
-```{r}
+
+```r
 m <- d1$day >"Mon" & d1$day < "Fri"
 ```
 # Create  dataframes for weekdays and weekends
 
-```{r}
+
+```r
 weekday <- d1[m,]
 weekend <- d1[!m,]
 ```
 # Calculate the mean steps for weekday
 
-```{r}
+
+```r
 for(i in seq_along(interval)) {
   wday <- summarise(group_by(weekday,interval), m = mean(steps)) 
 }
@@ -121,7 +155,8 @@ for(i in seq_along(interval)) {
 3. Plot for weekdays
 4. Calculate the mean steps for weekends
 5. Plot for weekends
-```{r Weekday-Weekend-AverageSteps}
+
+```r
 par(mfrow=c(2,1))
 par(mar=c(2,2,1,1))
 for(i in seq_along(interval)) {
@@ -140,3 +175,5 @@ plot(wend$interval,wend$m,type="l",xlab="Interval",
      ylab="Mean Steps", main="Weekend - Mean steps versus Interval",col="cyan",
      ylim=c(0,250), lwd=2.0)
 ```
+
+![](PA1_template_files/figure-html/Weekday-Weekend-AverageSteps-1.png) 
